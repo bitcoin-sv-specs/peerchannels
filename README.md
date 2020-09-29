@@ -28,40 +28,40 @@ A service identifies its customers/users via accounts. Message streams, whether 
 
 The Channel APIs, secured by account credentials, allow account holders to create and manage Channels. The following APIs are provided:
 
-                •	Create Channel
-                •	List Channels
-                •	Delete Channel
-                •	Get Channel Info
-                •	Get Token
-                •	Get Channel Tokens
-                •	Amend Channel
-                •	Generate Channel API Token
-                •	Revoke Channel API Token
-
+1. [Create Channel](#1-Create-Channel)  
+2. [List Channels](#2-List-Channels)  
+3. [Delete Channel](#3-Delete-Channel)  
+4. [Get Channel Info](#4-Get-Channel-Info)  
+5. [Get Token](#5-Get-Token)  
+6. [Get Channel Tokens](#6-Get-Channel-Tokens)  
+7. [Amend Channel](#7-Amend-Channel)  
+8. [Generate Channel API Token](#8-Generate-Channel-API-Token)  
+9. [Revoke Channel API Token](#9-Revoke-Channel-API-Token)  
 
 ## Message APIs
 
 Messaging APIs allow account holders, third parties, or even the general public to read from, or write to Channels
 
-                •	Write message to channel
-                •	Get message in channel
-                •	Mark message as *read* or *unread*
-                •	Get all *unread* messages in all channels
-                •	Delete message in channel
+10. [Write message to channel](#10-Write-message-to-channel)
+11. [Get messages in channel](#11-Get-messages-in-channel)
+12. [Mark message as *read* or *unread*](#12-Mark-messages-as-read-or-unread)
+13. [Delete message in channel](#13-Delete-message-in-channel)
+14. [Get all *unread* messages in all channels](#14-Get-Max-message-sequence-in-channel)
 
 
 ## Implementation
 
-**1. Create Channel**
+### 1. Create Channel
 
-```
 Creates a new channel owned by the account holder.
 
+```
 POST /api/v1/account/{accountid}/channel
 ```
 
-```
-**Response**
+#### Response
+
+```json
 {
   "id": "string",
   "href": "string",
@@ -87,15 +87,17 @@ POST /api/v1/account/{accountid}/channel
 }
 ```
 
-**2. List Channels**
+### 2. List Channels
 
-```
 Returns a list of all channels
 
+```
 GET /api/v1/account/{accountid}/channel/list
 ```
-```
-**Response**
+
+#### Response
+
+```json
 {
   "channels": [
     {
@@ -125,27 +127,31 @@ GET /api/v1/account/{accountid}/channel/list
 }
 ```
 
-**3. Delete Channel**
+### 3. Delete Channel
 
-```
 Deletes a single channel
 
+```
 DELETE /api/v1/account/{accountid}/channel/{channelid}
 ```
+
+#### Response
+
 ```
-**Response**
 200 OK
 ```
 
-**4. Get Channel Info**
+### 4. Get Channel Info
 
-```
 Returns single channel information
 
+```
 GET /api/v1/account/{accountid}/channel/{channelid}
 ```
-```
-**Response**
+
+#### Response
+
+```json
 {
   "id": "string",
   "href": "string",
@@ -170,15 +176,18 @@ GET /api/v1/account/{accountid}/channel/{channelid}
   ]
 }
 ```
-**5. Get Token**
 
-```
+### 5. Get Token
+
 Returns single token information
 
+```
 GET /api/v1/account/{accountid}/channel/{channelid}/api-token/{tokenid}
 ```
-```
-**Response**
+
+#### Response
+
+```json
 {
   "id": "string",
   "token": "string",
@@ -187,15 +196,18 @@ GET /api/v1/account/{accountid}/channel/{channelid}/api-token/{tokenid}
   "can_write": true
 }
 ```
-**6. Get Channel Tokens**
 
-```
+### 6. Get Channel Tokens
+
 Returns list of channel tokens. Optional filter on token value.
 
+```
 GET /api/v1/account/{accountid}/channel/{channelid}/api-token
 ```
-```
-**Response**
+
+#### Response
+
+```json
 {
   "id": "string",
   "token": "string",
@@ -204,11 +216,12 @@ GET /api/v1/account/{accountid}/channel/{channelid}/api-token
   "can_write": true
 }
 ```
-**7. Amend Channel**
 
-```
+### 7. Amend Channel
+
 Updates Channel metadata and permissions (read/write and locking a channel)
 
+```
 POST /api/v1/account/{accountid}/channel/{channelid}
 
 body:
@@ -218,16 +231,18 @@ body:
   "locked": true
 }
 ```
+
+#### Response
+
 ```
-**Response**
 200 OK
 ```
 
-**8. Generate Channel API Token**
+### 8. Generate Channel API Token
 
-```
 Generate new token for channel
 
+```
 POST /api/v1/account/{accountid}/channel/{channelid}/api-token
 
 body:
@@ -237,8 +252,10 @@ body:
   "can_write": true
 }
 ```
-```
-**Response**
+
+#### Response
+
+```json
 {
   "id": "string",
   "token": "string",
@@ -247,116 +264,125 @@ body:
   "can_write": true
 }
 ```
-**9. Revoke Channel API Token**
 
-```
+### 9. Revoke Channel API Token
+
 Revoke token for channel
 
+```
 DELETE /api/v1/account/{accountid}/channel/{channelid}/api-token/{tokenid}
+```
+
+#### Response
 
 ```
-```
-**Response**
 200 OK
 ```
 
-**10. Write message to channel**
+### 10. Write message to channel
 
-```
 Write new message to channel
 
+```
 POST /api/v1/channel/{channelid}
 
 ```
-```
-**Response**
+
+#### Response
+
+```json
 {
-    "sequence": int,
-    "received": string,
-    "content_type": string,
-    "payload": string
+    "sequence": 0,
+    "received": "string",
+    "content_type": "string",
+    "payload": "string"
 }
 ```
 
-**11. Get messages in channel**
+### 11. Get messages in channel
 
-```
 Get list of messages from channel. By default only unread messages are returned.
 
+```
 GET /api/v1/channel/{channelid}?unread=true
+```
 
-```
-```
-**Response**
+#### Response
+
+```json
 [
   {
     "sequence": 0,
-    "received": "2020-09-10T11:38:52.072Z",
+    "received": "string",
     "content_type": "string",
     "payload": "string"
   }
 ]
 ```
 
-**12. Mark messages as read/unread**
+### 12. Mark messages as read or unread
 
-```
 Mark message
 
+```
 POST /api/v1/channel/{channelid}/{sequence}
 
 body:
 
 {"read": true | false}
 ```
+
+#### Response
+
 ```
-**Response**
 200 OK
 ```
 
-**13. Delete message in channel**
+### 13. Delete message in channel
 
-```
 Delete message
 
+```
 DELETE /api/v1/channel/{channelid}/{sequence}
+```
+
+#### Response
 
 ```
-```
-**Response**
 200 OK
 ```
 
-**14. Get Max message sequence in channel**
+### 14. Get Max message sequence in channel
 
-```
 Max Sequence
 
+```
 HEAD /api/v1/channel/{channelid}
+```
+
+#### Response
 
 ```
-```
-**Response**
 200 OK
 ```
 
-**15. Push Notifications**
+### 15. Push Notifications
 
-```
 Subscribe to push notifications using web sockets.
 
+```
 GET /api/v1/channel/{channelid}/notify
-
+```
 Once the client receives the notification it is up to them to pull all unread messages/notifications from the Channel. 
 
-Notes:
+**Notes**:
 
-•	Notifications are generated automatically on the server side.
-•	Notification is sent for each message written to the channel, will be batched up in next release.
-•	Notification message is configurable in server configuration file.
+-	Notifications are generated automatically on the server side.
+-	Notification is sent for each message written to the channel, will be batched up in next release.
+-	Notification message is configurable in server configuration file.
 
-```
-**Client side encryption**
+
+### Client side encryption
 
 For SPV Channels release 0.1.0-beta, the encryption method supported is libsodium sealed_box which is an anonymous (you can not identify the sender) Public key encryption with integrity check (see here for more details: https://libsodium.gitbook.io/doc/public-key_cryptography/sealed_boxes )
 
@@ -366,6 +392,6 @@ Client side encryption will need to implement the algorithm :
 libsodium sealed_box <base64 encoded encryption key>
 ```
 
-**Channels Schema**
+## Channels Schema
 
 ![data model](image/data-model.png)
