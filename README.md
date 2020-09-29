@@ -54,7 +54,7 @@ Messaging APIs allow account holders, third parties, or even the general public 
 
 ### 1. Create Channel
 
-Creates a new channel owned by the account holder.
+#### Creates a new channel owned by the account holder.
 
 ```
 POST /api/v1/account/{accountid}/channel
@@ -90,7 +90,7 @@ POST /api/v1/account/{accountid}/channel
 
 ### 2. List Channels
 
-Returns a list of all channels
+#### Returns a list of all channels
 
 ```
 GET /api/v1/account/{accountid}/channel/list
@@ -130,7 +130,7 @@ GET /api/v1/account/{accountid}/channel/list
 
 ### 3. Delete Channel
 
-Deletes a single channel
+#### Deletes a single channel
 
 ```
 DELETE /api/v1/account/{accountid}/channel/{channelid}
@@ -139,7 +139,7 @@ DELETE /api/v1/account/{accountid}/channel/{channelid}
 #### Response
 
 ```
-200 OK
+Response is 204 No Content
 ```
 
 ### 4. Get Channel Info
@@ -180,7 +180,7 @@ GET /api/v1/account/{accountid}/channel/{channelid}
 
 ### 5. Get Token
 
-Returns single token information
+##### Returns single token information
 
 ```
 GET /api/v1/account/{accountid}/channel/{channelid}/api-token/{tokenid}
@@ -200,7 +200,7 @@ GET /api/v1/account/{accountid}/channel/{channelid}/api-token/{tokenid}
 
 ### 6. Get Channel Tokens
 
-Returns list of channel tokens. Optional filter on token value.
+##### Returns list of channel tokens. Optional filter on token value.
 
 ```
 GET /api/v1/account/{accountid}/channel/{channelid}/api-token
@@ -209,18 +209,21 @@ GET /api/v1/account/{accountid}/channel/{channelid}/api-token
 #### Response
 
 ```json
-{
-  "id": "string",
-  "token": "string",
-  "description": "string",
-  "can_read": true,
-  "can_write": true
-}
+  [
+    {
+     "id": "string",
+     "token": "string",
+     "description": "string",
+     "can_read": true,
+     "can_write": true
+    }
+  [
+
 ```
 
 ### 7. Amend Channel
 
-Updates Channel metadata and permissions (read/write and locking a channel)
+##### Updates Channel metadata and permissions (read/write and locking a channel)
 
 ```
 POST /api/v1/account/{accountid}/channel/{channelid}
@@ -241,7 +244,7 @@ body:
 
 ### 8. Generate Channel API Token
 
-Generate new token for channel
+##### Generate new token for channel
 
 ```
 POST /api/v1/account/{accountid}/channel/{channelid}/api-token
@@ -268,7 +271,7 @@ body:
 
 ### 9. Revoke Channel API Token
 
-Revoke token for channel
+##### Revoke token for channel
 
 ```
 DELETE /api/v1/account/{accountid}/channel/{channelid}/api-token/{tokenid}
@@ -277,12 +280,13 @@ DELETE /api/v1/account/{accountid}/channel/{channelid}/api-token/{tokenid}
 #### Response
 
 ```
-200 OK
+Response is 204 No Content
+
 ```
 
 ### 10. Write message to channel
 
-Write new message to channel
+##### Write new message to channel
 
 ```
 POST /api/v1/channel/{channelid}
@@ -302,7 +306,7 @@ POST /api/v1/channel/{channelid}
 
 ### 11. Get messages in channel
 
-Get list of messages from channel. By default only unread messages are returned.
+##### Get list of messages from channel. By default only unread messages are returned.
 
 ```
 GET /api/v1/channel/{channelid}?unread=true
@@ -323,7 +327,7 @@ GET /api/v1/channel/{channelid}?unread=true
 
 ### 12. Mark messages as read/unread
 
-Mark message
+##### Mark message
 
 ```
 POST /api/v1/channel/{channelid}/{sequence}
@@ -341,21 +345,23 @@ body:
 
 ### 13. Delete message in channel
 
-Delete message
+##### Delete message
 
 ```
 DELETE /api/v1/channel/{channelid}/{sequence}
+
 ```
 
 #### Response
 
 ```
-200 OK
+Response is 204 No Content
+
 ```
 
 ### 14. Get Max message sequence in channel
 
-Max Sequence
+##### Max Sequence
 
 ```
 HEAD /api/v1/channel/{channelid}
@@ -369,7 +375,7 @@ HEAD /api/v1/channel/{channelid}
 
 ### 15. Push Notifications
 
-Subscribe to push notifications using web sockets.
+##### Subscribe to push notifications using web sockets.
 
 ```
 GET /api/v1/channel/{channelid}/notify
