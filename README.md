@@ -16,7 +16,7 @@ Channels are configured to receive messages. Individual Channels have owners, an
 
 The security model is establised by prescribing an application-level end-to-end encryption protocol, which protects transported messages.
 
-A reference implementation of SPV Channels is shipped as a docker image and is available [SPV Channels CE](https://bitbucket.org/nchteamnch/spv-channels/src/develop/).
+A reference implementation of SPV Channels is shipped as a docker image and is available [SPV Channels CE](https://github.com/bitcoin-sv/spvchannels-reference/tree/1.0.0-beta).
 
 In summary channels specification is set of light weight JSON-over-HTTP public APIs for account holders, and their counterparties, to exchange messages in a secure manner.
 
