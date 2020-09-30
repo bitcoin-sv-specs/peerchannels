@@ -6,7 +6,7 @@ This draft spec is released as an RFC (request for comment) as part of the publi
 
 |     BRFC     |    title     | authors | version    |
 | :----------: | :----------: | :-----: | :-----:    |
-| d534abdf761f | spv_channels | nChain  | 0.1.0-beta |
+| d534abdf761f | spv_channels | nChain  | 1.0.0-beta |
 
 ## Overview
 
@@ -46,7 +46,6 @@ Messaging APIs allow account holders, third parties, or even the general public 
 11. [Get messages in channel](#11-Get-messages-in-channel)
 12. [Mark message as *read* or *unread*](#12-Mark-messages-as-read-or-unread)
 13. [Delete message in channel](#13-Delete-message-in-channel)
-14. [Get all *unread* messages in all channels](#14-Get-Max-message-sequence-in-channel)
 
 
 ## Implementation
@@ -352,21 +351,7 @@ DELETE /api/v1/channel/{channelid}/{sequence}
 200 OK
 ```
 
-### 14. Get Max message sequence in channel
-
-Max Sequence
-
-```
-HEAD /api/v1/channel/{channelid}
-```
-
-#### Response
-
-```
-200 OK
-```
-
-### 15. Push Notifications
+### 14. Push Notifications
 
 Subscribe to push notifications using web sockets.
 
