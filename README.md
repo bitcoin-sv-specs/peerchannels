@@ -6,7 +6,7 @@ This draft spec is released as an RFC (request for comment) as part of the publi
 
 |     BRFC     |    title     | authors | version    |
 | :----------: | :----------: | :-----: | :-----:    |
-| d534abdf761f | spv_channels | nChain  | 1.0.0-beta |
+| a0a4c8b96133 | spv_channels | nChain  | 1.0.0-beta |
 
 ## Overview
 
