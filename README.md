@@ -1,12 +1,12 @@
 ## RFC Notice
 
-This draft spec is released as an RFC (request for comment) as part of the public review process. Any comments, criticisms or suggestions should be directed toward the [issues page](https://github.com/bitcoin-sv-specs/brfc-spvxxxxx/issues) on this github repository.
+This draft spec is released as an RFC (request for comment) as part of the public review process. Any comments, criticisms or suggestions should be directed toward the [issues page](https://github.com/bitcoin-sv-specs/brfc-spvchannels/issues) on this github repository.
 
 # SPV Channels API Specification
 
 |     BRFC     |    title     | authors | version    |
 | :----------: | :----------: | :-----: | :-----:    |
-| d534abdf761f | spv_channels | nChain  | 1.0.0-beta |
+| bafaa3fa5d5b | spv_channels | nChain  | 1.0.0      |
 
 ## Overview
 
@@ -16,7 +16,7 @@ Channels are configured to receive messages. Individual Channels have owners, an
 
 The security model is establised by prescribing an application-level end-to-end encryption protocol, which protects transported messages.
 
-A reference implementation of SPV Channels is shipped as a docker image and is available [SPV Channels CE](https://bitbucket.org/nchteamnch/spv-channels/src/develop/).
+A reference implementation of SPV Channels is shipped as a docker image and is available [SPV Channels CE](https://github.com/bitcoin-sv/spvchannels-reference).
 
 In summary channels specification is set of light weight JSON-over-HTTP public APIs for account holders, and their counterparties, to exchange messages in a secure manner.
 
@@ -391,7 +391,7 @@ Once the client receives the notification it is up to them to pull all unread me
 
 ### Client side encryption
 
-For SPV Channels release 0.1.0-beta, the encryption method supported is libsodium sealed_box which is an anonymous (you can not identify the sender) Public key encryption with integrity check (see here for more details: https://libsodium.gitbook.io/doc/public-key_cryptography/sealed_boxes )
+For SPV Channels release 1.0.0, the encryption method supported is libsodium sealed_box which is an anonymous (you can not identify the sender) Public key encryption with integrity check (see here for more details: https://libsodium.gitbook.io/doc/public-key_cryptography/sealed_boxes )
 
 Client side encryption will need to implement the algorithm :
 
