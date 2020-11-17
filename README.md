@@ -28,26 +28,24 @@ A service identifies its customers/users via accounts. Message streams, whether 
 
 The Channel APIs, secured by account credentials, allow account holders to create and manage Channels. The following APIs are provided:
 
-                •	Create Channel
-                •	List Channels
-                •	Delete Channel
-                •	Get Channel Info
-                •	Get Token
-                •	Get Channel Tokens
-                •	Amend Channel
-                •	Generate Channel API Token
-                •	Revoke Channel API Token
-
+1. [Create Channel](#1-Create-Channel)  
+2. [List Channels](#2-List-Channels)  
+3. [Delete Channel](#3-Delete-Channel)  
+4. [Get Channel Info](#4-Get-Channel-Info)  
+5. [Get Token](#5-Get-Token)  
+6. [Get Channel Tokens](#6-Get-Channel-Tokens)  
+7. [Amend Channel](#7-Amend-Channel)  
+8. [Generate Channel API Token](#8-Generate-Channel-API-Token)  
+9. [Revoke Channel API Token](#9-Revoke-Channel-API-Token)  
 
 ## Message APIs
 
 Messaging APIs allow account holders, third parties, or even the general public to read from, or write to Channels
 
-                •	Write message to channel
-                •	Get message in channel
-                •	Mark message as *read* or *unread*
-                •	Get all *unread* messages in all channels
-                •	Delete message in channel
+10. [Write message to channel](#10-Write-message-to-channel)
+11. [Get messages in channel](#11-Get-messages-in-channel)
+12. [Mark message as *read* or *unread*](#12-Mark-messages-as-read-or-unread)
+13. [Delete message in channel](#13-Delete-message-in-channel)
 
 
 ## Implementation
