@@ -6,7 +6,7 @@ This draft spec is released as an RFC (request for comment) as part of the publi
 
 |     BRFC     |    title     | authors | version    |
 | :----------: | :----------: | :-----: | :-----:    |
-| bafaa3fa5d5b | spv_channels | nChain  | 1.0.0      |
+| bafaa3fa5d5b | spv_channels | nChain  | 1.1.0      |
 
 ## Overview
 
@@ -54,9 +54,9 @@ Messaging APIs allow account holders, third parties, or even the general public 
 
 #### Creates a new channel owned by the account holder.
 
-```
+
 POST /api/v1/account/{accountid}/channel
-```
+
 
 #### Response
 
