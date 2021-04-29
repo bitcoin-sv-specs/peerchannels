@@ -490,4 +490,4 @@ libsodium sealed_box <base64 encoded encryption key>
 
 ## Channels Server Schema
 
-![data model](LogicalDataModel.png)
+![data model](image/LogicalDataModel.png)
