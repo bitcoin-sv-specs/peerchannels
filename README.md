@@ -54,9 +54,9 @@ Messaging APIs allow account holders, third parties, or even the general public 
 
 #### Creates a new channel owned by the account holder.
 
-
+```
 POST /api/v1/account/{accountid}/channel
-
+```
 
 #### Response
 
@@ -387,16 +387,112 @@ Once the client receives the notification it is up to them to pull all unread me
 -	Notification message is configurable in server configuration file.
 
 
+### 16. Mobile SDK - Push Notifications to mobile
+
+The mobile SDK supports push notifications to iOS and Android devices.
+
+![data model](image/mobile-notfi-flow.png)
+
+Components Description:
+
+1. Sender (client applications and back end systems) trigger push notifications.
+
+2. To receive push notifications, user will integrate the SPV channels mobile SDK into their app
+
+3. The user device receives a shared token from the Firebase Cloud Messaging (FCM) component. The token is sent to the SPV Channel server
+
+4. The user device makes the push token available to the user’s app which sends the push notification token to channel server for storage. 
+
+5. The channel server creates the push message and includes the push token that maps to the relevant device. FCM uses the token to determine whether to send the message to the Apple Notification Service or an Android Notification Service.
+
+6. The notification service (APNS) performs the actual delivery of messages to the user’s device. APNS receives the message from FCM containing the original APNS token that was issued on registration of the device.
+
+#### Push Notification Message Structure
+
+SPV Channels for mobile notifications adopts the FCM Notification Message structure. 
+
+Sample Notification Message
+
+```json
+{
+ "to": "APA91bHun4MxP5egoKMwt2KZFBaFUH-1RYqx...",
+ "notification": {
+ "body": "2021-04-20T10:27:46.0792886Z",
+ "title": "New message arrived",
+ },
+ "data": {
+ "channelId": "w9TwhtkSvdPV0RUeO5fxbdSCvOX58AaSvu8D2YVWlKGhvHV_7ActuNAZkMLdCxd8_yaHcB_ieKankYGnPxe6zQ",
+ "message": "New message arrived",
+ "time": "2021-04-20T10:27:46.0792886Z",
+ }
+} 
+```
+
+#### Register mobile device on channels server
+
+This endpoint registers a device to receive notifications for the <api-token> that you authenticated with. 
+
+Note: Token in request body is the FCM token.
+
+Request:
+
+    ```json
+    POST /api/v1/pushnotifications
+
+    Authorization: <api-token>
+    ...
+
+          Body:
+
+                {
+
+                  "token": "string"
+                }
+    ```
+
+#### Updating FCM token on channels server
+
+The FCM token issued could change over time in the Firebase Cloud Messaging service. In the event of a token change the channels server needs to be notified. 
+
+
+Request:
+
+```
+PUT /api/v1/pushnotifications/{oldToken}
+```
+```json
+
+       Body:
+             {
+               "token": "string"
+             }
+```
+
+#### Unsubscribe from mobile push notifications
+
+```
+DELETE /api/v1/pushnotifications/{oldToken} 
+```
+or with optional parameter channelId
+```
+DELETE /api/v1/pushnotifications/{oldToken}?channelId={channelId} 
+```
+This optional parameter is useful if FCM token is registered with multiple channels and user would like to unsubscribe only one of them.
+
+#### User Interaction
+
+Combination of FCM, SDK for mobile, and the user’s App will control the user interaction. On receipt of notification Get Messages API is used to retrieve the message payload. Due the limitations on message size (4KB) the user is most likely expected to retrieve actual payloads on other systems, with the mobile acting only as the medium to alert the user of the existence of messages on a channel.
+
 ### Client side encryption
 
-For SPV Channels release 1.0.0, the encryption method supported is libsodium sealed_box which is an anonymous (you can not identify the sender) Public key encryption with integrity check (see here for more details: https://libsodium.gitbook.io/doc/public-key_cryptography/sealed_boxes )
+For SPV Channels release 1.1.0, the encryption method supported is libsodium sealed_box which is an anonymous (you can not identify the sender) Public key encryption with integrity check (see here for more details: https://libsodium.gitbook.io/doc/public-key_cryptography/sealed_boxes )
 
-Client side encryption will need to implement the algorithm :
+Client side encryption will need to implement the algorithm:
 
 ```
 libsodium sealed_box <base64 encoded encryption key>
 ```
 
-## Channels Schema
+## Channels Server Schema
 
 ![data model](image/data-model.png)
