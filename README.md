@@ -328,7 +328,7 @@ GET /api/v1/channel/{channelid}?unread=true
 ##### Mark message
 
 ```
-POST /api/v1/channel/{channelid}/{sequence}
+POST /api/v1/channel/{channelid}/{sequence}?older=true
 
 body:
 
@@ -422,9 +422,7 @@ Sample Notification Message
  },
  "data": {
  "channelId": "w9TwhtkSvdPV0RUeO5fxbdSCvOX58AaSvu8D2YVWlKGhvHV_7ActuNAZkMLdCxd8_yaHcB_ieKankYGnPxe6zQ",
- "message": "New message arrived",
- "time": "2021-04-20T10:27:46.0792886Z",
- }
+  }
 } 
 ```
 
@@ -440,12 +438,11 @@ Request:
     POST /api/v1/pushnotifications
 
     Authorization: <api-token>
-    ...
+    ```
 
           Body:
 
                 {
-
                   "token": "string"
                 }
     ```
@@ -495,4 +492,4 @@ libsodium sealed_box <base64 encoded encryption key>
 
 ## Channels Server Schema
 
-![data model](image/data-model.png)
+![data model](LogicalDataModel.png)
