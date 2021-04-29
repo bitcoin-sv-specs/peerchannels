@@ -433,13 +433,11 @@ This endpoint registers a device to receive notifications for the <api-token> th
 Note: Token in request body is the FCM token.
 
 Request:
-
-    ```json
+```
     POST /api/v1/pushnotifications
-
+```
     Authorization: <api-token>
-    ```
-
+    ```json
           Body:
 
                 {
