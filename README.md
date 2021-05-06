@@ -6,7 +6,7 @@ This draft spec is released as an RFC (request for comment) as part of the publi
 
 |     BRFC     |    title     | authors | version    |
 | :----------: | :----------: | :-----: | :-----:    |
-| bafaa3fa5d5b | spv_channels | nChain  | 1.1.0      |
+| bafaa3fa5d5b | spv_channels | nChain  | 1.1.0-beta      |
 
 ## Overview
 
@@ -480,7 +480,7 @@ Combination of FCM, SDK for mobile, and the user’s App will control the user i
 
 ### Client side encryption
 
-For SPV Channels release 1.1.0, the encryption method supported is libsodium sealed_box which is an anonymous (you can not identify the sender) Public key encryption with integrity check (see here for more details: https://libsodium.gitbook.io/doc/public-key_cryptography/sealed_boxes )
+For SPV Channels release 1.1.0-beta, the encryption method supported is libsodium sealed_box which is an anonymous (you can not identify the sender) Public key encryption with integrity check (see here for more details: https://libsodium.gitbook.io/doc/public-key_cryptography/sealed_boxes )
 
 Client side encryption will need to implement the algorithm:
 
