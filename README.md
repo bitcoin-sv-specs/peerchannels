@@ -10,43 +10,44 @@ This draft spec is released as an RFC (request for comment) as part of the publi
 
 ## Overview
 
-SPV Channels provides a mechanism via which counterparties (e.g. miners and client applications) can communicate in a secure manner even in instances where one of the parties is temporarily offline.
+SPV Channels provides a mechanism via which counterparties (e.g. miners and client applications) can communicate in a secure manner even in circumstances where one of the parties is temporarily offline.
 
-Channels are configured to receive messages. Individual Channels have owners, and owners may configure Channel read/write permissions for unauthenticated connections and distinct read/write permissions for those to whom they issue revocable API keys.
+Channels are configured to transport messages. Individual Channels have owners, and owners may configure Channel read/write permissions for unauthenticated connections and distinct read/write permissions for those to whom they issue revocable message API keys.
 
 The security model is establised by prescribing an application-level end-to-end encryption protocol, which protects transported messages.
 
-A reference implementation of SPV Channels is shipped as a docker image and is available [SPV Channels CE](https://github.com/bitcoin-sv/spvchannels-reference).
+A reference implementation of SPV Channels is shipped as a docker image and is available at [SPV Channels CE](https://github.com/bitcoin-sv/spvchannels-reference).
 
-In summary channels specification is set of light weight JSON-over-HTTP public APIs for account holders, and their counterparties, to exchange messages in a secure manner.
+In summary, channels specification is a set of light weight JSON-over-HTTP public APIs for account holders and their counterparties, to exchange messages in a secure manner.
 
 ## Account Registration
 
-A service identifies its customers/users via accounts. Message streams, whether one-shot or long-lived streams, are logically arranged into Channels, which in turn are owned by a single account. An account holder identifies itself to the platform via the account credentials. An account holder may generate API tokens which may be passed to third parties (message exchange counterparts), should the platform operator or Channel owner require authentication for its APIs.
+A service identifies its customers/users via accounts. Message streams, whether one-shot or long-lived streams, are logically arranged into Channels, which in turn are owned by a single account. An account holder identifies ithemselves to the platform via account credentials. An account holder may generate message API tokens which may be passed to third parties (message exchange counterparts), should the platform operator or Channel owner require authentication for use of its message API.
 
-## Channel APIs
+## Channels API
 
-The Channel APIs, secured by account credentials, allow account holders to create and manage Channels. The following APIs are provided:
+The Channels API, secured by account credentials, allows account holders to create and manage Channels. The following endpoints are provided:
 
 1. [Create Channel](#1-Create-Channel)  
 2. [List Channels](#2-List-Channels)  
 3. [Delete Channel](#3-Delete-Channel)  
 4. [Get Channel Info](#4-Get-Channel-Info)  
-5. [Get Token](#5-Get-Token)  
-6. [Get Channel Tokens](#6-Get-Channel-Tokens)  
+5. [Get Message API Token](#5-Get-Message-API-Token)  
+6. [Get Message API Tokens](#6-Get-Message-API-Tokens)  
 7. [Amend Channel](#7-Amend-Channel)  
-8. [Generate Channel API Token](#8-Generate-Channel-API-Token)  
-9. [Revoke Channel API Token](#9-Revoke-Channel-API-Token)  
+8. [Generate Message API Token](#8-Generate-Message-API-Token)  
+9. [Revoke Message-API-Token](#9-Revoke-Message-API-Token)  
 
-## Message APIs
+## Messages API
 
-Messaging APIs allow account holders, third parties, or even the general public to read from, or write to Channels:
+The Messages API allows account holders, third parties, or even the general public to read from, or write to, or request notification from Channels. Message API Tokens (obtained above) are required to use the following endpoints:
 
-10. [Write message to channel](#10-Write-message-to-channel)
-11. [Get messages in channel](#11-Get-messages-in-channel)
-12. [Mark message as *read* or *unread*](#12-Mark-messages-as-read-or-unread)
-13. [Delete message in channel](#13-Delete-message-in-channel)
-
+10. [Write Message to Channel](#10-Write-message-to-channel)
+11. [Get Messages from Channel](#11-Get-messages-from-channel)
+12. [Mark Channel Message as *read* or *unread*](#12-Mark-channel-messages-as-read-or-unread)
+13. [Delete Message from Channel](#13-Delete-message-from-channel)
+14. [Get Max Message Sequence from Channel](#14-Get-Max-Message-Sequence-from-Channel)
+15. [Push Notifications](#15-Push-Notifications)
 
 ## Implementation
 
@@ -88,7 +89,7 @@ POST /api/v1/account/{accountid}/channel
 
 ### 2. List Channels
 
-#### Returns a list of all channels
+#### Returns a list of all channels.
 
 ```
 GET /api/v1/account/{accountid}/channel/list
@@ -128,7 +129,7 @@ GET /api/v1/account/{accountid}/channel/list
 
 ### 3. Delete Channel
 
-#### Deletes a single channel
+#### Deletes a single channel.
 
 ```
 DELETE /api/v1/account/{accountid}/channel/{channelid}
@@ -137,12 +138,12 @@ DELETE /api/v1/account/{accountid}/channel/{channelid}
 #### Response
 
 ```
-Response is 204 No Content
+204 No Content
 ```
 
 ### 4. Get Channel Info
 
-Returns single channel information
+#### Returns information about a single channel.
 
 ```
 GET /api/v1/account/{accountid}/channel/{channelid}
@@ -176,9 +177,9 @@ GET /api/v1/account/{accountid}/channel/{channelid}
 }
 ```
 
-### 5. Get Token
+### 5. Get Message API Token
 
-##### Returns single token information
+##### Returns information about a single Message API Token for the channel.
 
 ```
 GET /api/v1/account/{accountid}/channel/{channelid}/api-token/{tokenid}
@@ -196,9 +197,9 @@ GET /api/v1/account/{accountid}/channel/{channelid}/api-token/{tokenid}
 }
 ```
 
-### 6. Get Channel Tokens
+### 6. Get Message API Tokens
 
-##### Returns list of channel tokens. Optional filter on token value.
+##### Returns a list of the Message API Tokens for the channel.
 
 ```
 GET /api/v1/account/{accountid}/channel/{channelid}/api-token
@@ -207,26 +208,26 @@ GET /api/v1/account/{accountid}/channel/{channelid}/api-token
 #### Response
 
 ```json
-  [
-    {
-     "id": "string",
-     "token": "string",
-     "description": "string",
-     "can_read": true,
-     "can_write": true
-    }
-  [
+[
+  {
+    "id": "string",
+    "token": "string",
+    "description": "string",
+    "can_read": true,
+    "can_write": true
+  }
+[
 
 ```
 
 ### 7. Amend Channel
 
-##### Updates Channel metadata and permissions (read/write and locking a channel)
+##### Updates channel metadata and permissions (read/write and locking a channel).
 
 ```
 POST /api/v1/account/{accountid}/channel/{channelid}
-
-body:
+```
+```json
 {
   "public_read": true,
   "public_write": true,
@@ -240,14 +241,14 @@ body:
 200 OK
 ```
 
-### 8. Generate Channel API Token
+### 8. Generate Message API Token
 
-##### Generate new token for channel
+##### Generate a new Message API Token for the channel.
 
 ```
 POST /api/v1/account/{accountid}/channel/{channelid}/api-token
-
-body:
+```
+```json
 {
   "description": "string",
   "can_read": true,
@@ -267,9 +268,9 @@ body:
 }
 ```
 
-### 9. Revoke Channel API Token
+### 9. Revoke Message API Token
 
-##### Revoke token for channel
+##### Revoke Message API Token for the channel.
 
 ```
 DELETE /api/v1/account/{accountid}/channel/{channelid}/api-token/{tokenid}
@@ -278,17 +279,16 @@ DELETE /api/v1/account/{accountid}/channel/{channelid}/api-token/{tokenid}
 #### Response
 
 ```
-Response is 204 No Content
+204 No Content
 
 ```
 
-### 10. Write message to channel
+### 10. Write Message to Channel
 
-##### Write new message to channel
+##### Write a new message to channel, requires a Message API bearer Token.
 
 ```
 POST /api/v1/channel/{channelid}
-
 ```
 
 #### Response
@@ -302,9 +302,10 @@ POST /api/v1/channel/{channelid}
 }
 ```
 
-### 11. Get messages in channel
+### 11. Get Messages from Channel
 
-##### Get list of messages from channel. By default only unread messages are returned.
+##### Get a list of messages from channel, requires a Message API bearer Token. 
+##### By default only unread messages are returned.
 
 ```
 GET /api/v1/channel/{channelid}?unread=true
@@ -323,16 +324,17 @@ GET /api/v1/channel/{channelid}?unread=true
 ]
 ```
 
-### 12. Mark messages as read/unread
+### 12. Mark Channel Messages as read/unread
 
-##### Mark message
+##### Mark one or more messages in the channel, requires a Message API bearer Token.
 
 ```
 POST /api/v1/channel/{channelid}/{sequence}?older=true
-
-body:
-
-{"read": true | false}
+```
+```json
+{
+  "read": true | false
+}
 ```
 
 #### Response
@@ -341,25 +343,23 @@ body:
 200 OK
 ```
 
-### 13. Delete message in channel
+### 13. Delete Message from Channel
 
-##### Delete message
+##### Delete the specified message from the channel, requires a Message API bearer Token.
 
 ```
 DELETE /api/v1/channel/{channelid}/{sequence}
-
 ```
 
 #### Response
 
 ```
-Response is 204 No Content
-
+204 No Content
 ```
 
-### 14. Get Max message sequence in channel
+### 14. Get Max Message Sequence from Channel
 
-##### Max Sequence
+##### Provide Max Sequence from the channel, requires a Message API bearer Token.
 
 ```
 HEAD /api/v1/channel/{channelid}
@@ -373,18 +373,20 @@ HEAD /api/v1/channel/{channelid}
 
 ### 15. Push Notifications
 
-##### Subscribe to push notifications using web sockets.
+
+##### Subscribe to push notifications using web sockets, requires a Message API bearer Token.
 
 ```
 GET /api/v1/channel/{channelid}/notify
 ```
-Once the client receives the notification it is up to them to pull all unread messages/notifications from the Channel. 
+
+Once the client receives the notification, they should pull all unread messages from the Channel. 
 
 **Notes**:
 
 -	Notifications are generated automatically on the server side.
--	Notification is sent for each message written to the channel, will be batched up in next release.
--	Notification message is configurable in server configuration file.
+-	Notifications are sent for each message written to the channel (these will be batched together in a future release).
+-	The Notification message is configurable in the server configuration file.
 
 
 ### 16. Mobile SDK - Push Notifications to mobile
@@ -395,17 +397,17 @@ The mobile SDK supports push notifications to iOS and Android devices.
 
 Components Description:
 
-1. Sender (client applications and back end systems) trigger push notifications.
+1. Sender (client applications and back end systems) trigger push notifications
 
 2. To receive push notifications, user will integrate the SPV channels mobile SDK into their app
 
 3. The user device receives a shared token from the Firebase Cloud Messaging (FCM) component. The token is sent to the SPV Channel server
 
-4. The user device makes the push token available to the user’s app which sends the push notification token to channel server for storage. 
+4. The user device makes the push token available to the user’s app which sends the push notification token to channel server for storage
 
-5. The channel server creates the push message and includes the push token that maps to the relevant device. FCM uses the token to determine whether to send the message to the Apple Notification Service or an Android Notification Service.
+5. The channel server creates the push message and includes the push token that maps to the relevant device. FCM uses the token to determine whether to send the message to the Apple Notification Service or an Android Notification Service
 
-6. The notification service (APNS) performs the actual delivery of messages to the user’s device. APNS receives the message from FCM containing the original APNS token that was issued on registration of the device.
+6. The notification service (APNS) performs the actual delivery of messages to the user’s device. APNS receives the message from FCM containing the original APNS token that was issued on registration of the device
 
 #### Push Notification Message Structure
 
@@ -415,52 +417,52 @@ Sample Notification Message
 
 ```json
 {
- "to": "APA91bHun4MxP5egoKMwt2KZFBaFUH-1RYqx...",
- "notification": {
- "body": "2021-04-20T10:27:46.0792886Z",
- "title": "New message arrived",
- },
- "data": {
- "channelId": "w9TwhtkSvdPV0RUeO5fxbdSCvOX58AaSvu8D2YVWlKGhvHV_7ActuNAZkMLdCxd8_yaHcB_ieKankYGnPxe6zQ",
+  "to": "APA91bHun4MxP5egoKMwt2KZFBaFUH-1RYqx...",
+  "notification": {
+    "body": "2021-04-20T10:27:46.0792886Z",
+    "title": "New message arrived",
+  },
+  "data": {
+    "channelId": "w9TwhtkSvdPV0RUeO5fxbdSCvOX58AaSvu8D2YVWlKGhvHV_7ActuNAZkMLdCxd8_yaHcB_ieKankYGnPxe6zQ",
   }
 } 
 ```
 
 #### Register mobile device on channels server
 
-This endpoint registers a device to receive notifications for the <api-token> that you authenticated with. 
+This endpoint registers a device to receive notifications for the Message API Token that you authenticated with. 
 
 Note: Token in request body is the FCM token.
 
-Request:
-```
-    POST /api/v1/pushnotifications
-```
-    Authorization: <api-token>
-    ```json
-          Body:
+##### Request
 
-                {
-                  "token": "string"
-                }
-    ```
+```
+POST /api/v1/pushnotifications
+```
+
+Authorization: Message API Token
+
+```json
+
+{
+  "token": "string"
+}
+```
 
 #### Updating FCM token on channels server
 
 The FCM token issued could change over time in the Firebase Cloud Messaging service. In the event of a token change the channels server needs to be notified. 
 
-
-Request:
+##### Request
 
 ```
 PUT /api/v1/pushnotifications/{oldToken}
 ```
-```json
 
-       Body:
-             {
-               "token": "string"
-             }
+```json
+{
+  "token": "string"
+}
 ```
 
 #### Unsubscribe from mobile push notifications
@@ -468,7 +470,9 @@ PUT /api/v1/pushnotifications/{oldToken}
 ```
 DELETE /api/v1/pushnotifications/{oldToken} 
 ```
+
 or with optional parameter channelId
+
 ```
 DELETE /api/v1/pushnotifications/{oldToken}?channelId={channelId} 
 ```
