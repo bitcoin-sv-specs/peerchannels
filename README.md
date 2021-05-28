@@ -36,7 +36,7 @@ The Channels API, secured by account credentials, allows account holders to crea
 6. [Get Message API Tokens](#6-Get-Message-API-Tokens)  
 7. [Amend Channel](#7-Amend-Channel)  
 8. [Generate Message API Token](#8-Generate-Message-API-Token)  
-9. [Revoke Message-API-Token](#9-Revoke-Message-API-Token)  
+9. [Revoke Message API Token](#9-Revoke-Message-API-Token)  
 
 ## Messages API
 
