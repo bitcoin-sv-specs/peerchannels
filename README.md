@@ -59,6 +59,22 @@ The Messages API allows account holders, third parties, or even the general publ
 POST /api/v1/account/{accountid}/channel
 ```
 
+#### Request
+
+```json
+{
+  "public_read": true or false,
+  "public_write": true or false,
+  "sequenced": true or false,
+  "retention": {
+    "min_age_days": null or <number>,
+    "max_age_days": null or <number>,
+    "auto_prune": true or false
+  }
+}
+```
+We recommend that you set sequenced to false and max_age_days to 9999 in the first insdtance.
+
 #### Response
 
 ```json
@@ -67,12 +83,12 @@ POST /api/v1/account/{accountid}/channel
   "href": "string",
   "public_read": true,
   "public_write": true,
-  "sequenced": true,
+  "sequenced": false,
   "locked": true,
   "head": 0,
   "retention": {
     "min_age_days": 0,
-    "max_age_days": 0,
+    "max_age_days": 9999,
     "auto_prune": true
   },
   "access_tokens": [
@@ -162,7 +178,7 @@ GET /api/v1/account/{accountid}/channel/{channelid}
   "head": 0,
   "retention": {
     "min_age_days": 0,
-    "max_age_days": 0,
+    "max_age_days": 9999,
     "auto_prune": true
   },
   "access_tokens": [
@@ -216,8 +232,7 @@ GET /api/v1/account/{accountid}/channel/{channelid}/api-token
     "can_read": true,
     "can_write": true
   }
-[
-
+]
 ```
 
 ### 7. Amend Channel
@@ -333,7 +348,7 @@ POST /api/v1/channel/{channelid}/{sequence}?older=true
 ```
 ```json
 {
-  "read": true | false
+  "read": true or false
 }
 ```
 
