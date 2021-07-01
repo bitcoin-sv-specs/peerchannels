@@ -1,5 +1,7 @@
 ## RFC Notice
 
+Readme version 1.1.1.
+
 This draft spec is released as an RFC (request for comment) as part of the public review process. Any comments, criticisms or suggestions should be directed toward the [issues page](https://github.com/bitcoin-sv-specs/brfc-spvchannels/issues) on this github repository.
 
 # SPV Channels API Specification
@@ -16,13 +18,13 @@ Channels are configured to transport messages. Individual Channels have owners, 
 
 The security model is establised by prescribing an application-level end-to-end encryption protocol, which protects transported messages.
 
-A reference implementation of SPV Channels is shipped as a docker image and is available at [SPV Channels CE](https://github.com/bitcoin-sv/spvchannels-reference).
+A reference implementation of SPV Channels is shipped as a docker image which uses docker hub, and is available at [SPV Channels CE](https://github.com/bitcoin-sv/spvchannels-reference).
 
 In summary, channels specification is a set of light weight JSON-over-HTTP public APIs for account holders and their counterparties, to exchange messages in a secure manner.
 
 ## Account Registration
 
-A service identifies its customers/users via accounts. Message streams, whether one-shot or long-lived streams, are logically arranged into Channels, which in turn are owned by a single account. An account holder identifies ithemselves to the platform via account credentials. An account holder may generate message API tokens which may be passed to third parties (message exchange counterparts), should the platform operator or Channel owner require authentication for use of its message API.
+A service identifies its customers/users via accounts. Message streams, whether one-shot or long-lived streams, are logically arranged into Channels, which in turn are owned by a single account. An account holder identifies ithemselves to the platform via account credentials. An account holder may generate message API tokens which may be passed to third parties (message exchange counterparts), since Channels require authentication for use of its message API.
 
 ## Channels API
 
@@ -31,16 +33,19 @@ The Channels API, secured by account credentials, allows account holders to crea
 1. [Create Channel](#1-Create-Channel)  
 2. [List Channels](#2-List-Channels)  
 3. [Delete Channel](#3-Delete-Channel)  
-4. [Get Channel Info](#4-Get-Channel-Info)  
-5. [Get Message API Token](#5-Get-Message-API-Token)  
-6. [Get Message API Tokens](#6-Get-Message-API-Tokens)  
-7. [Amend Channel](#7-Amend-Channel)  
+4. [Get Channel Info](#4-Get-Channel-Info)
+5. [Amend Channel](#5-Amend-Channel)  
+
+Message API Tokens are required to use the Messages API endpoints:
+
+6. [Get Message API Token](#6-Get-Message-API-Token)  
+7. [Get Message API Tokens](#7-Get-Message-API-Tokens)  
 8. [Generate Message API Token](#8-Generate-Message-API-Token)  
 9. [Revoke Message API Token](#9-Revoke-Message-API-Token)  
 
 ## Messages API
 
-The Messages API allows account holders, third parties, or even the general public to read from, or write to, or request notification from Channels. Message API Tokens (obtained above) are required to use the following endpoints:
+The Messages API allows account holders and third parties to read from, or write to, or request notification from Channels:
 
 10. [Write Message to Channel](#10-Write-message-to-channel)
 11. [Get Messages from Channel](#11-Get-messages-from-channel)
@@ -51,6 +56,8 @@ The Messages API allows account holders, third parties, or even the general publ
 
 ## Implementation
 
+Messages that have a JSON Request body, should use content-type "application/json".
+
 ### 1. Create Channel
 
 #### Creates a new channel owned by the account holder.
@@ -59,25 +66,41 @@ The Messages API allows account holders, third parties, or even the general publ
 POST /api/v1/account/{accountid}/channel
 ```
 
+#### JSON Request
+
+Recommended settings:
+```json
+{
+  "public_read": true, // if false, only the channel owner can read from the channel
+  "public_write": true, // if false, only the channel owner can write to the channel
+  "sequenced": false,  // if true, all channel messages must be marked as read before a message can be written
+  "retention": {
+    "min_age_days": 0,
+    "max_age_days": 9999,
+    "auto_prune": false
+  }
+}
+```
+
 #### Response
 
 ```json
 {
   "id": "string",
-  "href": "string",
+  "href": "string", // the URL to distrbute to channel users
   "public_read": true,
   "public_write": true,
-  "sequenced": true,
+  "sequenced": false,
   "locked": true,
-  "head": 0,
+  "head": number,
   "retention": {
     "min_age_days": 0,
-    "max_age_days": 0,
-    "auto_prune": true
+    "max_age_days": 9999,
+    "auto_prune": false
   },
   "access_tokens": [
     {
-      "id": "string",
+      "id": "string", // message API token required by message API
       "token": "string",
       "description": "string",
       "can_read": true,
@@ -105,13 +128,13 @@ GET /api/v1/account/{accountid}/channel/list
       "href": "string",
       "public_read": true,
       "public_write": true,
-      "sequenced": true,
-      "locked": true,
-      "head": 0,
+      "sequenced": false,
+      "locked": false,
+      "head": number,
       "retention": {
         "min_age_days": 0,
-        "max_age_days": 0,
-        "auto_prune": true
+        "max_age_days": 9999,
+        "auto_prune": false
       },
       "access_tokens": [
         {
@@ -157,13 +180,13 @@ GET /api/v1/account/{accountid}/channel/{channelid}
   "href": "string",
   "public_read": true,
   "public_write": true,
-  "sequenced": true,
-  "locked": true,
-  "head": 0,
+  "sequenced": false,
+  "locked": false,
+  "head": number,
   "retention": {
     "min_age_days": 0,
-    "max_age_days": 0,
-    "auto_prune": true
+    "max_age_days": 9999,
+    "auto_prune": false
   },
   "access_tokens": [
     {
@@ -177,7 +200,30 @@ GET /api/v1/account/{accountid}/channel/{channelid}
 }
 ```
 
-### 5. Get Message API Token
+### 5. Amend Channel
+
+##### Updates channel metadata and permissions (read/write and locking a channel).
+
+```
+POST /api/v1/account/{accountid}/channel/{channelid}
+```
+#### JSON Request
+```json
+{
+  "public_read": true or false,
+  "public_write": true or false,
+  "locked": true or false // if true, writing to the channel is not permitted
+}
+```
+
+#### Response
+
+```
+200 OK
+```
+
+
+### 6. Get Message API Token
 
 ##### Returns information about a single Message API Token for the channel.
 
@@ -197,7 +243,7 @@ GET /api/v1/account/{accountid}/channel/{channelid}/api-token/{tokenid}
 }
 ```
 
-### 6. Get Message API Tokens
+### 7. Get Message API Tokens
 
 ##### Returns a list of the Message API Tokens for the channel.
 
@@ -220,27 +266,6 @@ GET /api/v1/account/{accountid}/channel/{channelid}/api-token
 
 ```
 
-### 7. Amend Channel
-
-##### Updates channel metadata and permissions (read/write and locking a channel).
-
-```
-POST /api/v1/account/{accountid}/channel/{channelid}
-```
-```json
-{
-  "public_read": true,
-  "public_write": true,
-  "locked": true
-}
-```
-
-#### Response
-
-```
-200 OK
-```
-
 ### 8. Generate Message API Token
 
 ##### Generate a new Message API Token for the channel.
@@ -248,6 +273,7 @@ POST /api/v1/account/{accountid}/channel/{channelid}
 ```
 POST /api/v1/account/{accountid}/channel/{channelid}/api-token
 ```
+#### JSON Request
 ```json
 {
   "description": "string",
@@ -271,6 +297,7 @@ POST /api/v1/account/{accountid}/channel/{channelid}/api-token
 ### 9. Revoke Message API Token
 
 ##### Revoke Message API Token for the channel.
+Stops the token holder carry out the associated read or write channel operations as permitted by the Message API Token.
 
 ```
 DELETE /api/v1/account/{accountid}/channel/{channelid}/api-token/{tokenid}
@@ -285,26 +312,36 @@ DELETE /api/v1/account/{accountid}/channel/{channelid}/api-token/{tokenid}
 
 ### 10. Write Message to Channel
 
-##### Write a new message to channel, requires a Message API bearer Token.
+##### Write a new message to channel, uses a Message API Token as a bearer authorization token.
 
 ```
 POST /api/v1/channel/{channelid}
+```
+
+#### JSON Request
+
+```json
+{
+    "content_type": "string",
+    "payload": "string"
+}
 ```
 
 #### Response
 
 ```json
 {
-    "sequence": 0,
+    "sequence": number,
     "received": "string",
     "content_type": "string",
     "payload": "string"
 }
 ```
 
+
 ### 11. Get Messages from Channel
 
-##### Get a list of messages from channel, requires a Message API bearer Token. 
+##### Get a list of messages from channel, uses a Message API Token as a bearer authorization token. 
 ##### By default only unread messages are returned.
 
 ```
@@ -316,7 +353,7 @@ GET /api/v1/channel/{channelid}?unread=true
 ```json
 [
   {
-    "sequence": 0,
+    "sequence": number,
     "received": "string",
     "content_type": "string",
     "payload": "string"
@@ -326,14 +363,15 @@ GET /api/v1/channel/{channelid}?unread=true
 
 ### 12. Mark Channel Messages as read/unread
 
-##### Mark one or more messages in the channel, requires a Message API bearer Token.
+##### Mark one or more messages in the channel, uses a Message API Token as a bearer authorization token.
 
 ```
 POST /api/v1/channel/{channelid}/{sequence}?older=true
 ```
+#### JSON Request
 ```json
 {
-  "read": true | false
+  "read": true or false
 }
 ```
 
@@ -345,7 +383,7 @@ POST /api/v1/channel/{channelid}/{sequence}?older=true
 
 ### 13. Delete Message from Channel
 
-##### Delete the specified message from the channel, requires a Message API bearer Token.
+##### Delete the specified message from the channel, uses a Message API Token as a bearer authorization token.
 
 ```
 DELETE /api/v1/channel/{channelid}/{sequence}
@@ -359,7 +397,7 @@ DELETE /api/v1/channel/{channelid}/{sequence}
 
 ### 14. Get Max Message Sequence from Channel
 
-##### Provide Max Sequence from the channel, requires a Message API bearer Token.
+##### Provide Max Sequence from the channel, uses a Message API Token as a bearer authorization token.
 
 ```
 HEAD /api/v1/channel/{channelid}
@@ -374,19 +412,19 @@ HEAD /api/v1/channel/{channelid}
 ### 15. Push Notifications
 
 
-##### Subscribe to push notifications using web sockets, requires a Message API bearer Token.
+##### Subscribe to push notifications using web sockets, uses a Message API Token as a bearer authorization token.
 
 ```
 GET /api/v1/channel/{channelid}/notify
 ```
 
-Once the client receives the notification, they should pull all unread messages from the Channel. 
+Once the client receives the notification, they should pull all unread messages from the Channel (Get Messages from Channel, above). 
 
 **Notes**:
 
--	Notifications are generated automatically on the server side.
--	Notifications are sent for each message written to the channel (these will be batched together in a future release).
--	The Notification message is configurable in the server configuration file.
+- Notifications are generated automatically on the server side.
+- Notifications are sent for each message written to the channel (these will be batched together in a future release).
+- The Notification message is configurable in the server configuration file.
 
 
 ### 16. Mobile SDK - Push Notifications to mobile
