@@ -26,22 +26,40 @@ In summary, channels specification is a set of light weight JSON-over-HTTP publi
 
 A service identifies its customers/users via accounts. Message streams, whether one-shot or long-lived streams, are logically arranged into Channels, which in turn are owned by a single account. An account holder identifies ithemselves to the platform via account credentials. An account holder may generate message API tokens which may be passed to third parties (message exchange counterparts), since Channels require authentication for use of its message API.
 
+## Using Channels
+
+Channels may be bidirectional or unidirectional between two channel users.
+
+An account holder can create a channel which will return the channelid (used by other channel endpoints); a URL distributable to the other channel user; a tokenid used by the channel Message API Token endpoints; and a Message API Token for use with the Message API.
+
+The account holder will need to generate a Message API Token for the other channel user.
+
+The account holder can distribute the URL and a Message API Token to the other channel user.
+
+Each channel user can write messages to their channel using their Message API Token.
+
+Each channel user can read messages from their channel using their Message API Token.
+
+After reading a message, a channel user must mark the message as read, or delete the message, using their Message API Token.
+
+Bidirectional channels require two read-write Message API Tokens, whereas unidirectional channels require one read Message API Token and one write Message API Token.
+
 ## Channels API
 
 The Channels API, secured by account credentials, allows account holders to create and manage Channels. The following endpoints are provided:
 
 1. [Create Channel](#1-Create-Channel)  
-2. [List Channels](#2-List-Channels)  
+2. [Amend Channel](#2-Amend-Channel)  
 3. [Delete Channel](#3-Delete-Channel)  
 4. [Get Channel Info](#4-Get-Channel-Info)
-5. [Amend Channel](#5-Amend-Channel)  
+5. [List Channels](#5-List-Channels)  
 
-Message API Tokens are required to use the Messages API endpoints:
+Message API Tokens are required to use the Messages API:
 
-6. [Get Message API Token](#6-Get-Message-API-Token)  
-7. [Get Message API Tokens](#7-Get-Message-API-Tokens)  
-8. [Generate Message API Token](#8-Generate-Message-API-Token)  
-9. [Revoke Message API Token](#9-Revoke-Message-API-Token)  
+6. [Generate Message API Token](#6-Generate-Message-API-Token)  
+7. [Revoke Message API Token](#7-Revoke-Message-API-Token)  
+8. [Get Message API Token](#8-Get-Message-API-Token)  
+9. [Get Message API Tokens](#9-Get-Message-API-Tokens)  
 
 ## Messages API
 
@@ -86,68 +104,50 @@ Recommended settings:
 
 ```json
 {
-  "id": "string",
-  "href": "string", // the URL to distrbute to channel users
-  "public_read": true,
-  "public_write": true,
-  "sequenced": false,
-  "locked": true,
+  "id": "string", // the channelid used by other channel endpoints
+  "href": "string", // the URL to distrbute to other channel users
+  "public_read": true or false,
+  "public_write": true or false,
+  "sequenced": true or false,
+  "locked": true or false,
   "head": number,
   "retention": {
-    "min_age_days": 0,
-    "max_age_days": 9999,
-    "auto_prune": false
+    "min_age_days": number,
+    "max_age_days": number,
+    "auto_prune": true or false
   },
   "access_tokens": [
     {
-      "id": "string", // message API token required by message API
-      "token": "string",
+      "id": "string", // the tokenid required by other channel endpoints
+      "token": "string", // the message API token required by message API endpoints
       "description": "string",
-      "can_read": true,
-      "can_write": true
+      "can_read": true or false,
+      "can_write": true or false
     }
   ]
 }
 ```
 
-### 2. List Channels
+### 2. Amend Channel
 
-#### Returns a list of all channels.
+##### Updates channel metadata and permissions (read/write and locking a channel).
 
 ```
-GET /api/v1/account/{accountid}/channel/list
+POST /api/v1/account/{accountid}/channel/{channelid}
+```
+#### JSON Request
+```json
+{
+  "public_read": true or false,
+  "public_write": true or false,
+  "locked": true or false // if true, writing to the channel is not permitted
+}
 ```
 
 #### Response
 
-```json
-{
-  "channels": [
-    {
-      "id": "string",
-      "href": "string",
-      "public_read": true,
-      "public_write": true,
-      "sequenced": false,
-      "locked": false,
-      "head": number,
-      "retention": {
-        "min_age_days": 0,
-        "max_age_days": 9999,
-        "auto_prune": false
-      },
-      "access_tokens": [
-        {
-          "id": "string",
-          "token": "string",
-          "description": "string",
-          "can_read": true,
-          "can_write": true
-        }
-      ]
-    }
-  ]
-}
+```
+200 OK
 ```
 
 ### 3. Delete Channel
@@ -178,52 +178,113 @@ GET /api/v1/account/{accountid}/channel/{channelid}
 {
   "id": "string",
   "href": "string",
-  "public_read": true,
-  "public_write": true,
-  "sequenced": false,
-  "locked": false,
+  "public_read": true or false,
+  "public_write": true or false,
+  "sequenced": true or false,
+  "locked": true or false,
   "head": number,
   "retention": {
-    "min_age_days": 0,
-    "max_age_days": 9999,
-    "auto_prune": false
+    "min_age_days": number,
+    "max_age_days": number,
+    "auto_prune": true or false
   },
   "access_tokens": [
     {
       "id": "string",
       "token": "string",
       "description": "string",
-      "can_read": true,
-      "can_write": true
+      "can_read": true or false,
+      "can_write": true or false
     }
   ]
 }
 ```
 
-### 5. Amend Channel
+### 5. List Channels
 
-##### Updates channel metadata and permissions (read/write and locking a channel).
+#### Returns information about all channels.
 
 ```
-POST /api/v1/account/{accountid}/channel/{channelid}
+GET /api/v1/account/{accountid}/channel/list
+```
+
+#### Response
+
+```json
+{
+  "channels": [
+    {
+      "id": "string",
+      "href": "string",
+      "public_read": true or false,
+      "public_write": true or false,
+      "sequenced": true or false,
+      "locked": true or false,
+      "head": number,
+      "retention": {
+        "min_age_days": number,
+        "max_age_days": number,
+        "auto_prune": true or false
+      },
+      "access_tokens": [
+        {
+          "id": "string",
+          "token": "string",
+          "description": "string",
+          "can_read": true or false,
+          "can_write": true or false
+        }
+      ]
+    }
+  ]
+}
+```
+
+### 6. Generate Message API Token
+
+##### Generate a new Message API Token for the channel.
+
+```
+POST /api/v1/account/{accountid}/channel/{channelid}/api-token
 ```
 #### JSON Request
 ```json
 {
-  "public_read": true or false,
-  "public_write": true or false,
-  "locked": true or false // if true, writing to the channel is not permitted
+  "description": "string",
+  "can_read": true or false,
+  "can_write": true or false
 }
 ```
 
 #### Response
 
-```
-200 OK
+```json
+{
+  "id": "string", // the tokenid required by other channel (Message API Token) endpoints
+  "token": "string", // the message API token required by message API endpoints
+  "description": "string",
+  "can_read": true or false,
+  "can_write": true or false
+}
 ```
 
+### 7. Revoke Message API Token
 
-### 6. Get Message API Token
+##### Revoke Message API Token for the channel.
+Stops the token holder carrying out the associated read or write channel operations as permitted by the Message API Token.
+
+```
+DELETE /api/v1/account/{accountid}/channel/{channelid}/api-token/{tokenid}
+```
+
+#### Response
+
+```
+204 No Content
+
+```
+
+### 8. Get Message API Token
 
 ##### Returns information about a single Message API Token for the channel.
 
@@ -238,14 +299,14 @@ GET /api/v1/account/{accountid}/channel/{channelid}/api-token/{tokenid}
   "id": "string",
   "token": "string",
   "description": "string",
-  "can_read": true,
-  "can_write": true
+  "can_read": true or false,
+  "can_write": true or false
 }
 ```
 
-### 7. Get Message API Tokens
+### 9. Get Message API Tokens
 
-##### Returns a list of the Message API Tokens for the channel.
+##### Returns information about all of the Message API Tokens for the channel.
 
 ```
 GET /api/v1/account/{accountid}/channel/{channelid}/api-token
@@ -259,54 +320,10 @@ GET /api/v1/account/{accountid}/channel/{channelid}/api-token
     "id": "string",
     "token": "string",
     "description": "string",
-    "can_read": true,
-    "can_write": true
+    "can_read": true or false,
+    "can_write": true or false
   }
-[
-
-```
-
-### 8. Generate Message API Token
-
-##### Generate a new Message API Token for the channel.
-
-```
-POST /api/v1/account/{accountid}/channel/{channelid}/api-token
-```
-#### JSON Request
-```json
-{
-  "description": "string",
-  "can_read": true,
-  "can_write": true
-}
-```
-
-#### Response
-
-```json
-{
-  "id": "string",
-  "token": "string",
-  "description": "string",
-  "can_read": true,
-  "can_write": true
-}
-```
-
-### 9. Revoke Message API Token
-
-##### Revoke Message API Token for the channel.
-Stops the token holder carry out the associated read or write channel operations as permitted by the Message API Token.
-
-```
-DELETE /api/v1/account/{accountid}/channel/{channelid}/api-token/{tokenid}
-```
-
-#### Response
-
-```
-204 No Content
+]
 
 ```
 
@@ -343,6 +360,9 @@ POST /api/v1/channel/{channelid}
 
 ##### Get a list of messages from channel, uses a Message API Token as a bearer authorization token. 
 ##### By default only unread messages are returned.
+
+Gets either the unread or all messages from the channel.
+To avoid continually reading the same messages, use either Mark Channel Messages as Read, or Delete Message from Channel.
 
 ```
 GET /api/v1/channel/{channelid}?unread=true
@@ -423,7 +443,7 @@ Once the client receives the notification, they should pull all unread messages 
 **Notes**:
 
 - Notifications are generated automatically on the server side.
-- Notifications are sent for each message written to the channel (these will be batched together in a future release).
+- Notifications are sent for each message written to the channel.
 - The Notification message is configurable in the server configuration file.
 
 
@@ -481,7 +501,6 @@ POST /api/v1/pushnotifications
 Authorization: Message API Token
 
 ```json
-
 {
   "token": "string"
 }
@@ -518,7 +537,7 @@ This optional parameter is useful if FCM token is registered with multiple chann
 
 #### User Interaction
 
-Combination of FCM, SDK for mobile, and the user’s App will control the user interaction. On receipt of notification Get Messages API is used to retrieve the message payload. Due the limitations on message size (4KB) the user is most likely expected to retrieve actual payloads on other systems, with the mobile acting only as the medium to alert the user of the existence of messages on a channel.
+The combination of FCM, SDK for mobile, and the user’s App will control the user interaction. Upon receipt of a notification message, the Get Messages endpoint is used to retrieve the message payload. Due to the limitations on message size (4KB) the user is expected to retrieve the actual payload on other systems, with the mobile acting only as the medium to alert the user of the existence of messages on a channel.
 
 ### Client side encryption
 
